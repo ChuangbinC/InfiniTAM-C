@@ -126,6 +126,8 @@ namespace ITMLib
 	__global__ void renderColourFromNormal_device(Vector4u *outRendering, const Vector4f *ptsRay, const TVoxel *voxelData,
 		const typename TIndex::IndexData *voxelIndex, Vector2i imgSize, Vector3f lightSource)
 	{
+		printf("ITMVisualisationHelpers_CUDA renderColourFromNormal_device\n");
+		
 		int x = (threadIdx.x + blockIdx.x * blockDim.x), y = (threadIdx.y + blockIdx.y * blockDim.y);
 
 		if (x >= imgSize.x || y >= imgSize.y) return;

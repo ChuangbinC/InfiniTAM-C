@@ -1,3 +1,7 @@
+InfiniTAM的注释版本，只注释了部分流程
+
+----
+
 # InfiniTAM v3
 
 This is the main branch of the software bundle "InfiniTAM", the current version is actively maintained by:
@@ -7,7 +11,7 @@ This is the main branch of the software bundle "InfiniTAM", the current version 
   Stuart Golodetz <smg@robots.ox.ac.uk>  
   Michael Sapienza <michael.sapienza@eng.ox.ac.uk>  
   Tommaso Cavallari <tommaso.cavallari@unibo.it>
-  
+
 Previous maintainers and contributors are:
 
   Carl Yuheng Ren <carl@robots.ox.ac.uk>  

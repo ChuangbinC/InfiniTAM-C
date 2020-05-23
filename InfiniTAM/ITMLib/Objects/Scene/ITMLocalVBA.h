@@ -32,7 +32,11 @@ namespace ITMLib
 		int lastFreeBlockId;
 
 		int allocatedSize;
-
+		/**
+		 * @brief 在k键后调用，保存体素
+		 * @param {type} 
+		 * @return: 
+		 */
 		void SaveToDirectory(const std::string &outputDirectory) const
 		{
 			std::string VBFileName = outputDirectory + "voxel.dat";

@@ -15,13 +15,22 @@ _CPU_AND_GPU_CODE_ inline void convertDisparityToDepth(DEVICEPTR(float) *d_out, 
 	float depth;
 
 	if (disparity_tmp == 0) depth = 0.0;
+	// 为什么需要乘以8.0f
 	else depth = 8.0f * disparityCalibParams.y * fx_depth / disparity_tmp;
 
 	d_out[locId] = (depth > 0) ? depth : -1.0f;
 }
 
 #ifndef __METALC__
-
+/**
+ * @brief 将深度转换为米制浮点数，这里为affine表示输入的直接是深度图，并不是视差图
+ * 
+ * @param x 
+ * @param y 
+ * @param imgSize 
+ * @param depthCalibParams 
+ * @return _CPU_AND_GPU_CODE_ convertDepthAffineToFloat 
+ */
 _CPU_AND_GPU_CODE_ inline void convertDepthAffineToFloat(DEVICEPTR(float) *d_out, int x, int y, const CONSTPTR(short) *d_in, Vector2i imgSize, Vector2f depthCalibParams)
 {
 	int locId = x + y * imgSize.x;

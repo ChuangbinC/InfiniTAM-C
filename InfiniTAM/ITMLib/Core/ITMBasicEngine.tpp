@@ -347,9 +347,21 @@ Vector2i ITMBasicEngine<TVoxel,TIndex>::GetImageSize(void) const
 	return renderState_live->raycastImage->noDims;
 }
 
+
+/**
+ * @brief 获取图像函数，程序默认是调用这个函数
+ * 
+ * @tparam TVoxel 
+ * @tparam TIndex 
+ * @param out 
+ * @param getImageType 
+ * @param pose 
+ * @param intrinsics 
+ */
 template <typename TVoxel, typename TIndex>
 void ITMBasicEngine<TVoxel,TIndex>::GetImage(ITMUChar4Image *out, GetImageType getImageType, ORUtils::SE3Pose *pose, ITMIntrinsics *intrinsics)
 {
+	printf("ITMBasicEngine GetImage\n");
 	if (view == NULL) return;
 
 	out->Clear();
@@ -394,6 +406,8 @@ void ITMBasicEngine<TVoxel,TIndex>::GetImage(ITMUChar4Image *out, GetImageType g
 			imageType = IITMVisualisationEngine::RENDER_SHADED_GREYSCALE_IMAGENORMALS;
 		}
 
+		// printf("ITMBasicEngine GetImage2\n");
+		// 调用的是 ITMVisualisationEngine_CUDA 中的RenderImage
 		visualisationEngine->RenderImage(scene, trackingState->pose_d, &view->calib.intrinsics_d, renderState_live, renderState_live->raycastImage, imageType, raycastType);
 
 		ORUtils::Image<Vector4u> *srcImage = NULL;

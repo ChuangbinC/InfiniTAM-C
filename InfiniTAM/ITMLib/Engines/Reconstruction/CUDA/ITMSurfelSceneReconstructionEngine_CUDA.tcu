@@ -256,6 +256,8 @@ void ITMSurfelSceneReconstructionEngine_CUDA<TSurfel>::FindCorrespondingSurfels(
 #endif
 }
 
+
+
 template <typename TSurfel>
 void ITMSurfelSceneReconstructionEngine_CUDA<TSurfel>::FuseMatchedPoints(ITMSurfelScene<TSurfel> *scene, const ITMView *view, const ITMTrackingState *trackingState) const
 {
@@ -377,6 +379,7 @@ void ITMSurfelSceneReconstructionEngine_CUDA<TSurfel>::MergeSimilarSurfels(ITMSu
 template <typename TSurfel>
 void ITMSurfelSceneReconstructionEngine_CUDA<TSurfel>::PreprocessDepthMap(const ITMView *view, const ITMSurfelSceneParams& sceneParams) const
 {
+  printf("Hello World from GPU!\n");
   const float *depthMap = view->depth->GetData(MEMORYDEVICE_CUDA);
   const int height = view->depth->noDims.y;
   const ITMIntrinsics& intrinsics = view->calib.intrinsics_d;

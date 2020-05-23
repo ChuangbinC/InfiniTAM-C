@@ -90,6 +90,14 @@ void ITMViewBuilder_CPU::UpdateView(ITMView **view_ptr, ITMUChar4Image *rgbImage
 	this->UpdateView(view_ptr, rgbImage, depthImage, useBilateralFilter, modelSensorNoise, storePreviousImage);
 }
 
+/**
+ * @brief 将深度相机计算的视差转换为深度信息
+ * 
+ * @param depth_out 
+ * @param depth_in 
+ * @param depthIntrinsics 
+ * @param disparityCalibParams 
+ */
 void ITMViewBuilder_CPU::ConvertDisparityToDepth(ITMFloatImage *depth_out, const ITMShortImage *depth_in, const ITMIntrinsics *depthIntrinsics,
 	Vector2f disparityCalibParams)
 {
@@ -130,6 +138,7 @@ void ITMViewBuilder_CPU::DepthFiltering(ITMFloatImage *image_out, const ITMFloat
 
 void ITMViewBuilder_CPU::ComputeNormalAndWeights(ITMFloat4Image *normal_out, ITMFloatImage *sigmaZ_out, const ITMFloatImage *depth_in, Vector4f intrinsic)
 {
+	printf("calculate normal in ComputeNormalAndWeights\n");
 	Vector2i imgDims = depth_in->noDims;
 
 	const float *depthData_in = depth_in->GetData(MEMORYDEVICE_CPU);

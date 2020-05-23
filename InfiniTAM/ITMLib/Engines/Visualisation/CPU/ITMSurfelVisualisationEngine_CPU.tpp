@@ -84,6 +84,7 @@ template <typename TSurfel>
 void ITMSurfelVisualisationEngine_CPU<TSurfel>::RenderImage(const ITMSurfelScene<TSurfel> *scene, const ORUtils::SE3Pose *pose, const ITMSurfelRenderState *renderState,
                                                             ITMUChar4Image *outputImage, RenderImageType type) const
 {
+  printf("ITMSurfelVisualisationEngine_CPU RenderImage\n");
   // Prevent colour rendering if the surfels don't store colour information.
   if(type == Base::RENDER_COLOUR && !TSurfel::hasColourInformation) type = Base::RENDER_LAMBERTIAN;
 
@@ -142,6 +143,8 @@ void ITMSurfelVisualisationEngine_CPU<TSurfel>::RenderImage(const ITMSurfelScene
 #ifdef WITH_OPENMP
       #pragma omp parallel for
 #endif
+      printf("RENDER_NORMAL \n");
+      
       for(int locId = 0; locId < pixelCount; ++locId)
       {
         shade_pixel_normal(locId, surfelIndexImagePtr, surfels, outputImagePtr);

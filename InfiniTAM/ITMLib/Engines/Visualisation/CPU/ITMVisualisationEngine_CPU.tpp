@@ -229,6 +229,8 @@ template<class TVoxel, class TIndex>
 static void RenderImage_common(const ITMScene<TVoxel,TIndex> *scene, const ORUtils::SE3Pose *pose, const ITMIntrinsics *intrinsics,
 	const ITMRenderState *renderState, ITMUChar4Image *outputImage, IITMVisualisationEngine::RenderImageType type, IITMVisualisationEngine::RenderRaycastSelection raycastType)
 {
+	printf("ITMVisualisationEngine_CPU RenderImage_common \n");
+
 	Vector2i imgSize = outputImage->noDims;
 	Matrix4f invM = pose->GetInvM();
 

@@ -5,7 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
-
+#include <iostream>
 using namespace ITMLib;
 
 bool ITMLib::readIntrinsics(std::istream & src, ITMIntrinsics & dest)
@@ -46,7 +46,15 @@ bool ITMLib::readExtrinsics(const char *fileName, ITMExtrinsics & dest)
 	std::ifstream f(fileName);
 	return ITMLib::readExtrinsics(f, dest);
 }
-
+/**
+ * @brief 读取calib.txt中两个深度视差转换函数，如果是提供深度图需要设置affine标识或者不需要填写两个参数，
+ * 如果不填写两个参数，系统提供默认值(0.0001和0)，表示将毫米制转为米制
+ * 如果输入为Kinect视差图，需要设置两个Kinect深度视差转换因子
+ * @param src 
+ * @param dest 
+ * @return true 
+ * @return false 
+ */
 bool ITMLib::readDisparityCalib(std::istream & src, ITMDisparityCalib & dest)
 {
 	std::string word;
@@ -63,6 +71,7 @@ bool ITMLib::readDisparityCalib(std::istream & src, ITMDisparityCalib & dest)
 		type = ITMDisparityCalib::TRAFO_AFFINE;
 		src >> a;
 	} else {
+		std::cout << "Not Kinect and Not affine" <<std::endl;
 		std::stringstream wordstream(word);
 		wordstream >> a;
 		if (wordstream.fail()) return false;
@@ -70,7 +79,7 @@ bool ITMLib::readDisparityCalib(std::istream & src, ITMDisparityCalib & dest)
 
 	src >> b;
 	if (src.fail()) return false;
-
+	// 如果没有设置两个深度视差转换参数
 	if ((a == 0.0f) && (b == 0.0f)) {
 		type = ITMDisparityCalib::TRAFO_AFFINE;
 		a = 1.0f/1000.0f; b = 0.0f;
@@ -86,8 +95,17 @@ bool ITMLib::readDisparityCalib(const char *fileName, ITMDisparityCalib & dest)
 	return ITMLib::readDisparityCalib(f, dest);
 }
 
+/**
+ * @brief 读取calib.txt文件，设置相机内参和RGBD外参等
+ * 
+ * @param src 文件IO指针
+ * @param dest 
+ * @return true 
+ * @return false 
+ */
 bool ITMLib::readRGBDCalib(std::istream & src, ITMRGBDCalib & dest)
 {
+	// istream是引用传递，因此下面是连续读取，不能放错位置
 	if (!ITMLib::readIntrinsics(src, dest.intrinsics_rgb)) return false;
 	if (!ITMLib::readIntrinsics(src, dest.intrinsics_d)) return false;
 	if (!ITMLib::readExtrinsics(src, dest.trafo_rgb_to_depth)) return false;

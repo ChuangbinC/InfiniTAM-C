@@ -312,9 +312,16 @@ ITMBasicSurfelEngine<TSurfel>::ToSurfelImageType(GetImageType getImageType)
 	}
 }
 
+/**
+ * @brief 获取指定类型的图像（RGB、depth、normal）
+ * @param {type} 
+ * @return: 
+ */
 template <typename TSurfel>
 void ITMBasicSurfelEngine<TSurfel>::GetImage(ITMUChar4Image *out, GetImageType getImageType, ORUtils::SE3Pose *pose, ITMIntrinsics *intrinsics)
 {
+	printf("ITMBasicSurfelEngine GetImage \n");
+
 	if (view == NULL) return;
 
 	out->Clear();
@@ -343,6 +350,7 @@ void ITMBasicSurfelEngine<TSurfel>::GetImage(ITMUChar4Image *out, GetImageType g
 			out->UpdateHostFromDevice();
 			break;
 		}
+	// 下面是自由角度时候的图像，因此需要输入一个新的pose
 	case ITMBasicSurfelEngine::InfiniTAM_IMAGE_FREECAMERA_SHADED:
 	case ITMBasicSurfelEngine::InfiniTAM_IMAGE_FREECAMERA_COLOUR_FROM_VOLUME:
 	case ITMBasicSurfelEngine::InfiniTAM_IMAGE_FREECAMERA_COLOUR_FROM_NORMAL:

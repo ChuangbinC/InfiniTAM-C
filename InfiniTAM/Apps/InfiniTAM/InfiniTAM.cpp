@@ -210,6 +210,7 @@ try
 		break;
 	}
 
+	// 建立一个UIEngine的单例对象，./Files/Out是图片保存的地址，需要事先建立一个文件夹
 	UIEngine::Instance()->Initialise(argc, argv, imageSource, imuSource, mainEngine, "./Files/Out", internalSettings->deviceType);
 	UIEngine::Instance()->Run();
 	UIEngine::Instance()->Shutdown();

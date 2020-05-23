@@ -93,10 +93,22 @@ __global__ void ck_shade_pixel_grey(int pixelCount, const unsigned int *surfelIn
   }
 }
 
+/**
+ * @brief CUDA版本法线构造函数（这个函数可能只是让法线显示得更加立体，可能并没有计算法线），本程序显示的法线是调用这个函数
+ * 
+ * @tparam TSurfel 
+ * @param pixelCount 
+ * @param surfelIndexImage 
+ * @param surfels 
+ * @param outputImage 
+ * @return __global__ ck_shade_pixel_normal 
+ */
 template <typename TSurfel>
 __global__ void ck_shade_pixel_normal(int pixelCount, const unsigned int *surfelIndexImage, const TSurfel *surfels, Vector4u *outputImage)
 {
   int locId = threadIdx.x + blockDim.x * blockIdx.x;
+      printf("ck_shade_pixel_normal \n");
+
   if(locId < pixelCount)
   {
     shade_pixel_normal(locId, surfelIndexImage, surfels, outputImage);
@@ -223,6 +235,8 @@ template <typename TSurfel>
 void ITMSurfelVisualisationEngine_CUDA<TSurfel>::RenderImage(const ITMSurfelScene<TSurfel> *scene, const ORUtils::SE3Pose *pose, const ITMSurfelRenderState *renderState,
                                                              ITMUChar4Image *outputImage, RenderImageType type) const
 {
+	printf("ITMSurfelVisualisationEngine_CUDA RenderImage\n");
+
   // Prevent colour rendering if the surfels don't store colour information.
   if(type == Base::RENDER_COLOUR && !TSurfel::hasColourInformation) type = Base::RENDER_LAMBERTIAN;
 

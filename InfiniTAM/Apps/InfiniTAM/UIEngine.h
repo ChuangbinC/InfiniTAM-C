@@ -20,6 +20,7 @@ namespace InfiniTAM
 		{
 			static UIEngine* instance;
 
+			// 表示程序的执行状态，单帧，从VIDEO连续读取，退出等状态
 			enum MainLoopAction
 			{
 				PROCESS_PAUSED, PROCESS_FRAME, PROCESS_VIDEO, EXIT, SAVE_TO_DISK
@@ -49,6 +50,8 @@ namespace InfiniTAM
 			Vector2i winSize;
 			uint textureId[NUM_WIN];
 			ITMUChar4Image *outImage[NUM_WIN];
+			// outImageType[0]控制的是大窗口的图像显示类型
+			// outImageType[1]控制的是右上窗口的图像显示类型
 			ITMLib::ITMMainEngine::GetImageType outImageType[NUM_WIN];
 
 			ITMUChar4Image *inputRGBImage; ITMShortImage *inputRawDepthImage;

@@ -125,7 +125,11 @@ namespace ITMLib
 		/** Maximum number of total entries. */
 		int getNumAllocatedVoxelBlocks(void) { return SDF_LOCAL_BLOCK_NUM; }
 		int getVoxelBlockSize(void) { return SDF_BLOCK_SIZE3; }
-
+		/**
+		 * @brief 在k键后调用，保存体素
+		 * @param {type} 
+		 * @return: 
+		 */
 		void SaveToDirectory(const std::string &outputDirectory) const
 		{
 			std::string hashEntriesFileName = outputDirectory + "hash.dat";
@@ -134,7 +138,8 @@ namespace ITMLib
 
 			std::ofstream ofs(lastFreeExcessListIdFileName.c_str());
 			if (!ofs) throw std::runtime_error("Could not open " + lastFreeExcessListIdFileName + " for writing");
-
+			
+			// 写入到last.txt文件
 			ofs << lastFreeExcessListId;
 			ORUtils::MemoryBlockPersister::SaveMemoryBlock(hashEntriesFileName, *hashEntries, memoryType);
 			ORUtils::MemoryBlockPersister::SaveMemoryBlock(excessAllocationListFileName, *excessAllocationList, memoryType);

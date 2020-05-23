@@ -217,6 +217,7 @@ void ITMSurfelSceneReconstructionEngine_CPU<TSurfel>::PreprocessDepthMap(const I
   float *radiusMap = this->m_radiusMapMB->GetData(MEMORYDEVICE_CPU);
   Vector4f *vertexMap = this->m_vertexMapMB->GetData(MEMORYDEVICE_CPU);
   const int width = view->depth->noDims.x;
+  // std::cout << "In PreprocessDepthMap ...." << std::endl;
 
   // Calculate the vertex map.
 #ifdef WITH_OPENMP
@@ -235,7 +236,7 @@ void ITMSurfelSceneReconstructionEngine_CPU<TSurfel>::PreprocessDepthMap(const I
   {
     calculate_normal(locId, vertexMap, width, height, normalMap);
   }
-
+  std::cout << "normal calculating finnished!" << std::endl;
   // Calculate the radius map.
 #ifdef WITH_OPENMP
   #pragma omp parallel for

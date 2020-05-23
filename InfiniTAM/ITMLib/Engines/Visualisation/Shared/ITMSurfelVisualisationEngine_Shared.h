@@ -3,10 +3,9 @@
 #pragma once
 
 #include <climits>
-
 #include "ITMSurfelVisualisationEngine_Settings.h"
 #include "../../../Objects/Scene/ITMRepresentationAccess.h"
-
+// #include <iostream>
 namespace ITMLib
 {
 
@@ -55,6 +54,16 @@ inline void calculate_projected_surfel_bounds(int locId, int indexImageWidth, in
   if(maxY >= indexImageHeight) maxY = indexImageHeight - 1;
 }
 
+_CPU_AND_GPU_CODE_
+inline float max(const float a, const float b){
+  return a > b ? a : b;
+}
+
+_CPU_AND_GPU_CODE_
+inline float min(const float a, const float b){
+  return a < b ? a : b;
+}
+
 /**
  * \brief Computes a colour to represent the specified normal vector.
  *
@@ -65,12 +74,27 @@ _CPU_AND_GPU_CODE_
 inline Vector4u colourise_normal(const Vector3f& n)
 {
   // FIXME: Borrowed from drawPixelNormal - refactor.
+  // return Vector4u(
+  //   (uchar)((0.3f + (-n.x + 1.0f)*0.35f)*255.0f),
+  //   (uchar)((0.3f + (-n.y + 1.0f)*0.35f)*255.0f),
+  //   (uchar)((0.3f + (-n.z + 1.0f)*0.35f)*255.0f),
+  //   255
+  // );
+
   return Vector4u(
-    (uchar)((0.3f + (-n.x + 1.0f)*0.35f)*255.0f),
-    (uchar)((0.3f + (-n.y + 1.0f)*0.35f)*255.0f),
-    (uchar)((0.3f + (-n.z + 1.0f)*0.35f)*255.0f),
+    (uchar)(((min(max(n.x,-1.0f),1.0f) + 1.0f)*0.5f)*255.0f),
+    (uchar)(((min(max(n.y,-1.0f),1.0f) + 1.0f)*0.5f)*255.0f),
+    (uchar)(((min(max(n.z,-1.0f),1.0f) + 1.0f)*0.5f)*255.0f),
     255
   );
+
+
+  // return Vector4u(
+  //   (uchar)(((min(max(n.x,-1.0f),1.0f) + 1.0f)*0.5f)*255.0f),
+  //   (uchar)(((min(max(n.y,-1.0f),1.0f) + 1.0f)*0.5f)*255.0f),
+  //   (uchar)(((min(max(n.z,-1.0f),1.0f) + 1.0f)*0.5f)*255.0f),
+  //   255
+  // );
 }
 
 /**
@@ -410,6 +434,8 @@ void shade_pixel_normal(int locId, const unsigned int *surfelIndexImage, const T
   if(surfelIndex >= 0)
   {
     value = colourise_normal(surfels[surfelIndex].normal);
+    // std::cout << "colourise_normal " <<std::endl;
+    printf("colourise_normal \n");
   }
 
   outputImage[locId] = value;

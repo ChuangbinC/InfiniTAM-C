@@ -204,6 +204,14 @@ _CPU_AND_GPU_CODE_ inline void computeNormalAndAngle(THREADPTR(bool) & foundPoin
 	if (!(angle > 0.0)) foundPoint = false;
 }
 
+/**
+ * @brief 计算法线和相机角度，使用的方法应该是光线投影的方法
+ * https://mrl.nyu.edu/~perlin/courses/spring2012/computing-normals.html
+ * 使用的应该是上面的计算公式
+ * @tparam useSmoothing 
+ * @tparam flipNormals 
+ * @return _CPU_AND_GPU_CODE_ computeNormalAndAngle 
+ */
 template <bool useSmoothing, bool flipNormals>
 _CPU_AND_GPU_CODE_ inline void computeNormalAndAngle(THREADPTR(bool) & foundPoint, const THREADPTR(int) &x, const THREADPTR(int) &y,
 	const CONSTPTR(Vector4f) *pointsRay, const THREADPTR(Vector3f) & lightSource, const THREADPTR(float) &voxelSize,
@@ -223,7 +231,7 @@ _CPU_AND_GPU_CODE_ inline void computeNormalAndAngle(THREADPTR(bool) & foundPoin
 	else
 	{
 		if (y <= 1 || y >= imgSize.y - 2 || x <= 1 || x >= imgSize.x - 2) { foundPoint = false; return; }
-
+		// 待求点的四个邻域点(十字)，然后获得两条相交叉的直线，做叉积获得法线
 		xp1_y = pointsRay[(x + 1) + y * imgSize.x], x_yp1 = pointsRay[x + (y + 1) * imgSize.x];
 		xm1_y = pointsRay[(x - 1) + y * imgSize.x], x_ym1 = pointsRay[x + (y - 1) * imgSize.x];
 	}
@@ -257,7 +265,7 @@ _CPU_AND_GPU_CODE_ inline void computeNormalAndAngle(THREADPTR(bool) & foundPoin
 			return;
 		}
 	}
-
+	// 上面网页有类似的计算公式
 	outNormal.x = -(diff_x.y * diff_y.z - diff_x.z*diff_y.y);
 	outNormal.y = -(diff_x.z * diff_y.x - diff_x.x*diff_y.z);
 	outNormal.z = -(diff_x.x * diff_y.y - diff_x.y*diff_y.x);
@@ -304,11 +312,21 @@ _CPU_AND_GPU_CODE_ inline void drawPixelConfidence(DEVICEPTR(Vector4u) & dest, c
 	dest = TO_UCHAR4(outRes);
 }
 
+
+
+/**
+ * @brief 法线可视化函数
+ * 
+ * @return _CPU_AND_GPU_CODE_ drawPixelNormal 
+ */
 _CPU_AND_GPU_CODE_ inline void drawPixelNormal(DEVICEPTR(Vector4u) & dest, const THREADPTR(Vector3f) & normal_obj)
 {
-	dest.r = (uchar)((0.3f + (-normal_obj.r + 1.0f)*0.35f)*255.0f);
-	dest.g = (uchar)((0.3f + (-normal_obj.g + 1.0f)*0.35f)*255.0f);
-	dest.b = (uchar)((0.3f + (-normal_obj.b + 1.0f)*0.35f)*255.0f);
+	// dest.r = (uchar)((0.3f + (-normal_obj.r + 1.0f)*0.35f)*255.0f);
+	// dest.g = (uchar)((0.3f + (-normal_obj.g + 1.0f)*0.35f)*255.0f);
+	// dest.b = (uchar)((0.3f + (-normal_obj.b + 1.0f)*0.35f)*255.0f);
+	dest.r = (uchar)(((MIN(MAX(-normal_obj.r,-1.0f),1.0f) + 1.0f)*0.5f)*255.0f);
+	dest.g = (uchar)(((MIN(MAX(-normal_obj.g,-1.0f),1.0f) + 1.0f)*0.5f)*255.0f);
+	dest.b = (uchar)(((MIN(MAX(-normal_obj.b,-1.0f),1.0f) + 1.0f)*0.5f)*255.0f);
 }
 
 template<class TVoxel, class TIndex>
@@ -462,6 +480,15 @@ _CPU_AND_GPU_CODE_ inline void processPixelColour(DEVICEPTR(Vector4u) &outRender
 	else outRendering = Vector4u((uchar)0);
 }
 
+/**
+ * @brief 程序显示用到的法线计算函数
+ * 
+ * @tparam TVoxel 
+ * @tparam TIndex 
+ * @param foundPoint 
+ * @param lightSource 
+ * @return _CPU_AND_GPU_CODE_ processPixelNormal 
+ */
 template<class TVoxel, class TIndex>
 _CPU_AND_GPU_CODE_ inline void processPixelNormal(DEVICEPTR(Vector4u) &outRendering, const CONSTPTR(Vector3f) & point,
 	bool foundPoint, const CONSTPTR(TVoxel) *voxelData, const CONSTPTR(typename TIndex::IndexData) *voxelIndex,
@@ -469,6 +496,7 @@ _CPU_AND_GPU_CODE_ inline void processPixelNormal(DEVICEPTR(Vector4u) &outRender
 {
 	Vector3f outNormal;
 	float angle;
+	printf("ITMVisualisationEngine_Shared processPixelNormal\n");
 
 	computeNormalAndAngle<TVoxel, TIndex>(foundPoint, point, voxelData, voxelIndex, lightSource, outNormal, angle);
 

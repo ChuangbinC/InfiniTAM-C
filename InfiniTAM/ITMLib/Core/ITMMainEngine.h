@@ -16,6 +16,21 @@
     point to the library.
 */
 
+/**
+ * @brief 
+ * 主引擎，实例化所有其他引擎并为其提供简化的接口。
+ * 
+ * 此类是ITMLib库的主要入口点，并且基本上执行整个KinectFusion算法。它在内部存储了最新的图像以及3D世界模型，此外还可以跟踪相机的姿势。
+ * 
+ * 预期用途如下：
+ * -＃创建一个ITMMainEngine，指定内部设置，相机参数和图像大小
+ * -＃使用@ref GetView()获取指向内部存储图像的指针，并将新图像信息写入该内存
+ * -＃调用方法@ref ProcessFrame()跟踪摄像机并将新信息集成到世界模型中
+ * -＃（可选）使用@ref GetImage()访问渲染的重建图像或其他图像以进行可视化
+ * -＃对序列中的每个图像重复上述三个步骤
+ * 
+ * 要访问内部信息，请查看成员变量@ref trackingState和@ref scene。
+ */
 namespace ITMLib
 {
 	/** \brief

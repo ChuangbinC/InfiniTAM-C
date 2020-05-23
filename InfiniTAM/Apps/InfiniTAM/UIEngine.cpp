@@ -39,13 +39,19 @@ static void safe_glutBitmapString(void *font, const char *str)
 	}
 }
 
+/**
+ * @brief 图像输出显示模块，分别显示三个窗口的图像
+ * @param  
+ * @return: 
+ */
 void UIEngine::glutDisplayFunction()
 {
 	UIEngine *uiEngine = UIEngine::Instance();
 
 	// get updated images from processing thread
+	// 调用的是 ITMBasicEngine<TVoxel,TIndex>::GetImage
 	uiEngine->mainEngine->GetImage(uiEngine->outImage[0], uiEngine->outImageType[0], &uiEngine->freeviewPose, &uiEngine->freeviewIntrinsics);
-
+	// printf("glutDisplayFunction \n");
 	for (int w = 1; w < NUM_WIN; w++) uiEngine->mainEngine->GetImage(uiEngine->outImage[w], uiEngine->outImageType[w]);
 
 	// do the actual drawing
@@ -53,8 +59,16 @@ void UIEngine::glutDisplayFunction()
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glEnable(GL_TEXTURE_2D);
 
+
+	// 下面是一个图像数组，分别代表三个窗口的图像
 	ITMUChar4Image** showImgs = uiEngine->outImage;
 	Vector4f *winReg = uiEngine->winReg;
+
+	// // 保存法线图 showImgs[1] 
+	// char str[250];
+	// sprintf(str, "%s/%04d.png", outFolder, currentFrameNo);
+	// SaveImageToFile(showImgs[1],str)
+
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	{
@@ -163,6 +177,11 @@ void UIEngine::glutIdleFunction()
 	}
 }
 
+/**
+ * @brief 按键处理函数，负责处理按下的按键
+ * @param {type} 
+ * @return: 
+ */
 void UIEngine::glutKeyUpFunction(unsigned char key, int x, int y)
 {
 	UIEngine *uiEngine = UIEngine::Instance();
@@ -216,14 +235,17 @@ void UIEngine::glutKeyUpFunction(unsigned char key, int x, int y)
 		if (uiEngine->freeviewActive)
 		{
 			uiEngine->outImageType[0] = ITMMainEngine::InfiniTAM_IMAGE_SCENERAYCAST;
-			uiEngine->outImageType[1] = ITMMainEngine::InfiniTAM_IMAGE_ORIGINAL_DEPTH;
+			// uiEngine->outImageType[1] = ITMMainEngine::InfiniTAM_IMAGE_ORIGINAL_DEPTH;
+			uiEngine->outImageType[1] = ITMMainEngine::InfiniTAM_IMAGE_COLOUR_FROM_NORMAL;
 
 			uiEngine->freeviewActive = false;
 		}
 		else
 		{
 			uiEngine->outImageType[0] = ITMMainEngine::InfiniTAM_IMAGE_FREECAMERA_SHADED;
-			uiEngine->outImageType[1] = ITMMainEngine::InfiniTAM_IMAGE_SCENERAYCAST;
+			// uiEngine->outImageType[1] = ITMMainEngine::InfiniTAM_IMAGE_SCENERAYCAST;
+			uiEngine->outImageType[1] = ITMMainEngine::InfiniTAM_IMAGE_COLOUR_FROM_NORMAL;
+
 
 			uiEngine->freeviewPose.SetFrom(uiEngine->mainEngine->GetTrackingState()->pose_d);
 			if (uiEngine->mainEngine->GetView() != NULL) {
@@ -510,7 +532,7 @@ void UIEngine::Initialise(int & argc, char** argv, ImageSourceEngine *imageSourc
 	{
 		size_t len = strlen(outFolder);
 		this->outFolder = new char[len + 1];
-		strcpy(this->outFolder, outFolder);
+		strcpy(this->outFolder, outFolder);	
 	}
 
 	//Vector2i winSize;
@@ -568,8 +590,13 @@ void UIEngine::Initialise(int & argc, char** argv, ImageSourceEngine *imageSourc
 
 	saveImage = new ITMUChar4Image(imageSource->getDepthImageSize(), true, false);
 
+	// 一开始三个窗口显示图像的类型
 	outImageType[0] = ITMMainEngine::InfiniTAM_IMAGE_SCENERAYCAST;
-	outImageType[1] = ITMMainEngine::InfiniTAM_IMAGE_ORIGINAL_DEPTH;
+	// 修改为显示深度图
+	// outImageType[1] = ITMMainEngine::InfiniTAM_IMAGE_ORIGINAL_DEPTH;
+
+	// 修改为显示法线图
+	outImageType[1] = ITMMainEngine::InfiniTAM_IMAGE_COLOUR_FROM_NORMAL;
 	outImageType[2] = ITMMainEngine::InfiniTAM_IMAGE_ORIGINAL_RGB;
 	if (inputRGBImage->noDims == Vector2i(0, 0)) outImageType[2] = ITMMainEngine::InfiniTAM_IMAGE_UNKNOWN;
 	//outImageType[3] = ITMMainEngine::InfiniTAM_IMAGE_SCENERAYCAST;
@@ -594,6 +621,11 @@ void UIEngine::Initialise(int & argc, char** argv, ImageSourceEngine *imageSourc
 	printf("initialised.\n");
 }
 
+/**
+ * @brief 
+ * @param {type} 
+ * @return 
+ */
 void UIEngine::SaveScreenshot(const char *filename) const
 {
 	ITMUChar4Image screenshot(getWindowSize(), true, false);
@@ -606,6 +638,11 @@ void UIEngine::GetScreenshot(ITMUChar4Image *dest) const
 	glReadPixels(0, 0, dest->noDims.x, dest->noDims.y, GL_RGBA, GL_UNSIGNED_BYTE, dest->GetData(MEMORYDEVICE_CPU));
 }
 
+/**
+ * @brief 应该是每一帧的处理过程
+ * @param {type} 
+ * @return: 
+ */
 void UIEngine::ProcessFrame()
 {
 	if (!imageSource->hasMoreImages()) return;
@@ -616,10 +653,21 @@ void UIEngine::ProcessFrame()
 		else imuSource->getMeasurement(inputIMUMeasurement);
 	}
 
+	ITMUChar4Image* showImgs = outImage[1];
+	if (showImgs->noDims != Vector2i(0, 0)) {
+		char str[250];
+		// 保存法线
+		sprintf(str, "%s/%04d.png", outFolder, currentFrameNo);
+		// SaveImageToPNG(showImgs, str);
+	}
+
+
+
+
 	if (isRecording)
 	{
 		char str[250];
-
+		// 保存深度图
 		sprintf(str, "%s/%04d.pgm", outFolder, currentFrameNo);
 		SaveImageToFile(inputRawDepthImage, str);
 
@@ -658,6 +706,10 @@ void UIEngine::ProcessFrame()
 	currentFrameNo++;
 }
 
+/**
+ * @brief glutMainLoop()的作用是进入一个死循环，不断检测程序之前注册的那些回调函数是否应该被调用，类似轮询(polling)机制。
+ * 
+ */
 void UIEngine::Run() { glutMainLoop(); }
 void UIEngine::Shutdown()
 {
